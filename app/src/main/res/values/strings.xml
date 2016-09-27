@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 <resources>
     <string name="app_name">Polychromatic Tuner</string>
     <string name="title_activity_select_tuning">SelectTuningActivity</string>
     <string name="select_tuning">Select Tuning</string>
     <string name="title_activity_main">MainActivity</string>
 </resources>
+=======
+<resources>
+    <string name="app_name">Polychromatic Tuner</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+</resources>
+>>>>>>> fe4be3feaea04ecea6942f88b3dccff9a590980e
