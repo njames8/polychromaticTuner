@@ -68,9 +68,4 @@ public enum GuitarTuning implements Tuning {
         return super.ordinal();
     }
 
-    @Override
-    public Tuning[] getValues() {
-        return values();
-    }
-
 }
