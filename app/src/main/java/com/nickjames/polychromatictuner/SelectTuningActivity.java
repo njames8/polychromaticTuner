@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,8 +15,9 @@ import android.widget.Spinner;
 import com.nickjames.polychromatictuner.instruments.Instrument;
 import com.nickjames.polychromatictuner.tunings.Tuning;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SelectTuningActivity extends AppCompatActivity {
@@ -27,7 +27,8 @@ public class SelectTuningActivity extends AppCompatActivity {
     Spinner spinner;
     Instrument currentInstrument;
     RadioGroup tuningGroup;
-    SparseArray<Tuning> tuningRadioButtonMap;
+    // switch to radio -> tuning
+    HashMap<Integer, Integer> tuningOrdinalToRadioButtonId;
     ArrayList<RadioButton> radioButtons;
 
     @Override
@@ -52,6 +53,12 @@ public class SelectTuningActivity extends AppCompatActivity {
         tuningGroup = (RadioGroup) findViewById(R.id.tuning_list);
         if (tuningGroup != null) {
             tuningGroup.setOrientation(RadioGroup.VERTICAL);
+            tuningGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                }
+            });
         }
 
 
@@ -71,16 +78,17 @@ public class SelectTuningActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent != null) {
-            Serializable i = intent.getSerializableExtra(TunerActivity.INSTRUMENT);
-            Serializable s = intent.getSerializableExtra(TunerActivity.TUNING);
-            if (i != null) {
-                currentInstrument = (Instrument) i;
+            int i = intent.getIntExtra(TunerActivity.INSTRUMENT, -1);
+            if (i != -1) {
+                currentInstrument = Instrument.values()[i];
                 spinner.setSelection(adapter.getPosition(currentInstrument));
-                if (s != null) {
+                int s = intent.getIntExtra(TunerActivity.TUNING, -1);
+                if (s != -1) {
                     updateRadioButtons();
-                    int index = tuningRadioButtonMap.indexOfValue((Tuning) s);
-                    int key = tuningRadioButtonMap.keyAt(index);
-                    setSelectedRadioButton(key);
+                    System.out.println(s);
+                    System.out.println(tuningOrdinalToRadioButtonId.toString());
+                    int radioId = tuningOrdinalToRadioButtonId.get(s);
+                    setSelectedRadioButton(radioId);
                 } else if (radioButtons != null && radioButtons.size() > 0) {
                     setSelectedRadioButton(radioButtons.get(0).getId());
                 }
@@ -90,25 +98,28 @@ public class SelectTuningActivity extends AppCompatActivity {
 
     private void updateRadioButtons() {
         Tuning [] tunings = currentInstrument.getTunings();
-        tuningRadioButtonMap = new SparseArray<>();
+        tuningOrdinalToRadioButtonId = new HashMap<>();
         radioButtons = new ArrayList<>();
         for (Tuning t : tunings) {
             RadioButton rb = new RadioButton(this);
             rb.setText(t.getDisplayName());
             rb.setGravity(Gravity.CENTER_HORIZONTAL);
             tuningGroup.addView(rb);
-            tuningRadioButtonMap.put(rb.getId(), t);
+            tuningOrdinalToRadioButtonId.put(t.getOrdinal(), rb.getId());
             radioButtons.add(rb);
         }
-
     }
 
 
     @Override
     public void onBackPressed() {
         Intent i = new Intent(this, TunerActivity.class);
-        Tuning t = tuningRadioButtonMap.get(tuningGroup.getCheckedRadioButtonId());
-        i.putExtra(TUNING, t.getOrdinal());
+        int radioId = tuningGroup.getCheckedRadioButtonId();
+        for (Map.Entry<Integer, Integer> e : tuningOrdinalToRadioButtonId.entrySet()) {
+            if (e.getValue().equals(radioId)) {
+                i.putExtra(TUNING, e.getKey());
+            }
+        }
         i.putExtra(INSTRUMENT, currentInstrument.ordinal());
         setResult(RESULT_OK, i);
         finish();

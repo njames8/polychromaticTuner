@@ -29,8 +29,12 @@ public class TunerActivity extends AppCompatActivity {
 
     public void sendMessage(View view) {
         Intent intent = new Intent(this, SelectTuningActivity.class);
-        intent.putExtra(TUNING, currentTuning);
-        intent.putExtra(INSTRUMENT, currentInstrument);
+        if (currentTuning != null) {
+            intent.putExtra(TUNING, currentTuning.getOrdinal());
+        }
+        if (currentInstrument != null) {
+            intent.putExtra(INSTRUMENT, currentInstrument.ordinal());
+        }
         startActivityForResult(intent, 1);
     }
 
@@ -45,14 +49,13 @@ public class TunerActivity extends AppCompatActivity {
                     currentInstrument = Instrument.values()[ci];
                     sb.append(currentInstrument.getDisplayName());
                     sb.append(" - ");
-                }
-                int ct = data.getIntExtra(SelectTuningActivity.TUNING, -1);
-                if (ct != -1) {
-                    currentTuning =
-                    sb.append(currentTuning.getDisplayName());
+                    int ct = data.getIntExtra(SelectTuningActivity.TUNING, -1);
+                    if (ct != -1) {
+                        currentTuning = currentInstrument.getTunings()[ct];
+                        sb.append(currentTuning.getDisplayName());
+                    }
                 }
                 tuningButton.setText(sb.toString());
-
             }
         }
     }
