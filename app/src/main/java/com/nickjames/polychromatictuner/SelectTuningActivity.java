@@ -27,9 +27,8 @@ public class SelectTuningActivity extends AppCompatActivity {
     Spinner spinner;
     Instrument currentInstrument;
     RadioGroup tuningGroup;
-    // switch to radio -> tuning
-    HashMap<Integer, Integer> tuningOrdinalToRadioButtonId;
     ArrayList<RadioButton> radioButtons;
+    Tuning currentTuning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +55,14 @@ public class SelectTuningActivity extends AppCompatActivity {
             tuningGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
-
+                    RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
+                    boolean isChecked = checkedRadioButton.isChecked();
+                    if (isChecked) {
+                        currentTuning =
+                                currentInstrument.getTuningByDisplayName(
+                                        checkedRadioButton.getText().toString())
+                                ;
+                    }
                 }
             });
         }
@@ -82,15 +88,12 @@ public class SelectTuningActivity extends AppCompatActivity {
             if (i != -1) {
                 currentInstrument = Instrument.values()[i];
                 spinner.setSelection(adapter.getPosition(currentInstrument));
-                int s = intent.getIntExtra(TunerActivity.TUNING, -1);
-                if (s != -1) {
+                int t = intent.getIntExtra(TunerActivity.TUNING, -1);
+                if (t != -1) {
                     updateRadioButtons();
-                    System.out.println(s);
-                    System.out.println(tuningOrdinalToRadioButtonId.toString());
-                    int radioId = tuningOrdinalToRadioButtonId.get(s);
-                    setSelectedRadioButton(radioId);
+                    setSelectedRadioButtonForTuning(currentInstrument.getTunings()[t]);
                 } else if (radioButtons != null && radioButtons.size() > 0) {
-                    setSelectedRadioButton(radioButtons.get(0).getId());
+                    setSelectedRadioButtonForTuning(currentInstrument.getTunings()[0]);
                 }
             }
         }
@@ -98,14 +101,12 @@ public class SelectTuningActivity extends AppCompatActivity {
 
     private void updateRadioButtons() {
         Tuning [] tunings = currentInstrument.getTunings();
-        tuningOrdinalToRadioButtonId = new HashMap<>();
         radioButtons = new ArrayList<>();
         for (Tuning t : tunings) {
             RadioButton rb = new RadioButton(this);
             rb.setText(t.getDisplayName());
             rb.setGravity(Gravity.CENTER_HORIZONTAL);
             tuningGroup.addView(rb);
-            tuningOrdinalToRadioButtonId.put(t.getOrdinal(), rb.getId());
             radioButtons.add(rb);
         }
     }
@@ -114,20 +115,19 @@ public class SelectTuningActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent i = new Intent(this, TunerActivity.class);
-        int radioId = tuningGroup.getCheckedRadioButtonId();
-        for (Map.Entry<Integer, Integer> e : tuningOrdinalToRadioButtonId.entrySet()) {
-            if (e.getValue().equals(radioId)) {
-                i.putExtra(TUNING, e.getKey());
-            }
+        if (currentInstrument != null) {
+            i.putExtra(INSTRUMENT, currentInstrument.ordinal());
         }
-        i.putExtra(INSTRUMENT, currentInstrument.ordinal());
+        if (currentTuning != null) {
+            i.putExtra(TUNING, currentTuning.getOrdinal());
+        }
         setResult(RESULT_OK, i);
         finish();
     }
 
-    private void setSelectedRadioButton(int id) {
+    private void setSelectedRadioButtonForTuning(Tuning t) {
         for (RadioButton rb : radioButtons) {
-            if (rb.getId() == id) {
+            if (rb.getText().equals(t.getDisplayName())) {
                 rb.setSelected(true);
             } else {
                 rb.setSelected(false);

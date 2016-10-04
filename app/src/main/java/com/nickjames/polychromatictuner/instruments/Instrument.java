@@ -4,6 +4,8 @@ import com.nickjames.polychromatictuner.tunings.GuitarTuning;
 import com.nickjames.polychromatictuner.tunings.Tuning;
 
 /**
+ * Represents an instrument. Each instrument has an enum holding all of the common tunings of that
+ * instrument
  * Created by Nick on 9/24/2016.
  */
 
@@ -23,5 +25,14 @@ public enum Instrument {
 
     public Tuning[] getTunings() {
         return tunings;
+    }
+
+    public Tuning getTuningByDisplayName(String tuningDisplayName) {
+        for (Tuning t : tunings) {
+            if (t.getDisplayName().equals(tuningDisplayName)) {
+                return t;
+            }
+        }
+        return null;
     }
 }

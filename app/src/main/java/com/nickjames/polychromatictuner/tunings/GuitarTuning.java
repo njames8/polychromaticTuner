@@ -8,6 +8,7 @@ import java.util.List;
 import static com.nickjames.polychromatictuner.notes.Note.*;
 
 /**
+ * All of the common guitar tunings
  * Created by Nick on 9/24/2016.
  */
 public enum GuitarTuning implements Tuning {
@@ -38,11 +39,8 @@ public enum GuitarTuning implements Tuning {
     OPEN_B_MIN("Open B min", B, F_SHARP, B, F_SHARP, B, D),
 
     ;
-    public static final long SerialId = 1L;
     String displayName;
     List<Note> notes;
-
-
 
     GuitarTuning(String displayName, Note... notes) {
         this.displayName = displayName;
