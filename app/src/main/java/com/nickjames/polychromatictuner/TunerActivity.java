@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.nickjames.polychromatictuner.instruments.Instrument;
-import com.nickjames.polychromatictuner.tunings.Tuning;
+import com.nickjames.polychromatictuner.enums.instruments.Instrument;
+import com.nickjames.polychromatictuner.enums.tunings.Tuning;
 
 public class TunerActivity extends AppCompatActivity {
     public static final String TUNING = "com.nickjames.polychromatictuner.TunerActivity.TUNING";

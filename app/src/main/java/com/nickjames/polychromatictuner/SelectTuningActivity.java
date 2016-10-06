@@ -12,12 +12,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 
-import com.nickjames.polychromatictuner.instruments.Instrument;
-import com.nickjames.polychromatictuner.tunings.Tuning;
+import com.nickjames.polychromatictuner.enums.instruments.Instrument;
+import com.nickjames.polychromatictuner.enums.tunings.Tuning;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class SelectTuningActivity extends AppCompatActivity {
