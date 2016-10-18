@@ -38,10 +38,12 @@ public class CheckableLinearLayout extends LinearLayout implements Checkable {
         super(context, attrs);
     }
 
+    @Override
     public boolean isChecked() {
         return mChecked;
     }
 
+    @Override
     public void setChecked(boolean b) {
         if (b != mChecked) {
             mChecked = b;
@@ -49,6 +51,7 @@ public class CheckableLinearLayout extends LinearLayout implements Checkable {
         }
     }
 
+    @Override
     public void toggle() {
         setChecked(!mChecked);
     }

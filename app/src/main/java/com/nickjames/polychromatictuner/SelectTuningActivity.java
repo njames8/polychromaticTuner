@@ -1,7 +1,6 @@
 package com.nickjames.polychromatictuner;
 
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -56,6 +54,7 @@ public class SelectTuningActivity extends AppCompatActivity {
                     Instrument i = adapter.getItem(position);
                     if (i != null && !i.equals(currentInstrument)) {
                         currentInstrument = i;
+                        currentTuning = null;
                         updateRadioButtons();
                     }
                 }
@@ -72,6 +71,7 @@ public class SelectTuningActivity extends AppCompatActivity {
                     spinner.setSelection(adapter.getPosition(currentInstrument));
                     int t = intent.getIntExtra(TunerActivity.TUNING, -1);
                     if (t != -1) {
+                        currentTuning = currentInstrument.getTunings()[t];
                         updateRadioButtons();
 
                     } else if (radioButtons != null && radioButtons.size() > 0) {
@@ -88,17 +88,16 @@ public class SelectTuningActivity extends AppCompatActivity {
             if (lv != null) {
                 final TuningAdapter tuningAdapter = new TuningAdapter(currentInstrument.getTunings());
                 lv.setAdapter(tuningAdapter);
-                lv.setOnItemSelectedListener( new ListView.OnItemSelectedListener() {
+                lv.setOnItemClickListener( new ListView.OnItemClickListener() {
                     @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         currentTuning = tuningAdapter.getItem(position);
                     }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
                 });
+                if (currentTuning != null) {
+                    lv.setSelection(currentTuning.getOrdinal());
+                    lv.setItemChecked(currentTuning.getOrdinal(), true);
+                }
             }
         }
     }
@@ -114,6 +113,7 @@ public class SelectTuningActivity extends AppCompatActivity {
             i.putExtra(TUNING, currentTuning.getOrdinal());
         }
         setResult(RESULT_OK, i);
+        System.out.println(i.getExtras().toString());
         finish();
     }
 
@@ -121,7 +121,7 @@ public class SelectTuningActivity extends AppCompatActivity {
 
         Tuning[] tunings;
 
-        public TuningAdapter(Tuning[]tunings) {
+        TuningAdapter(Tuning[]tunings) {
             this.tunings = tunings;
         }
 
@@ -139,7 +139,6 @@ public class SelectTuningActivity extends AppCompatActivity {
         public long getItemId(int position) {
             return tunings[position].hashCode();
         }
-
 
         @Override
         public View getView(int position, View convertView, ViewGroup container) {
