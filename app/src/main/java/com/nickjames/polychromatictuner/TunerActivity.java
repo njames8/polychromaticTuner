@@ -3,6 +3,7 @@ package com.nickjames.polychromatictuner;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
@@ -21,9 +22,16 @@ public class TunerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tuner);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_tuner);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
+
         this.tuningButton = (Button) findViewById(R.id.button);
         if (currentTuning != null) {
             tuningButton.setText(currentTuning.getDisplayName());
+        } else {
+            tuningButton.setText(R.string.select_tuning);
         }
     }
 
@@ -54,8 +62,8 @@ public class TunerActivity extends AppCompatActivity {
                         currentTuning = currentInstrument.getTunings()[ct];
                         sb.append(currentTuning.getDisplayName());
                     }
+                    tuningButton.setText(sb.toString());
                 }
-                tuningButton.setText(sb.toString());
             }
         }
     }

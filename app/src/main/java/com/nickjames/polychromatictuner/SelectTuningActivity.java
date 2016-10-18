@@ -3,6 +3,7 @@ package com.nickjames.polychromatictuner;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,22 +11,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.nickjames.polychromatictuner.enums.instruments.Instrument;
 import com.nickjames.polychromatictuner.enums.tunings.Tuning;
 
-import java.util.ArrayList;
 
-
+/**
+ * This activity allows the user to select their desired instrument and tuning.
+ */
 public class SelectTuningActivity extends AppCompatActivity {
     public static String TUNING = "com.nickjames.polychromatictuner.SelectTuningActivity.TUNING";
     public static String INSTRUMENT = "com.nickjames.polychromatictuner.SelectTuningActivity.INSTRUMENT";
 
     Instrument currentInstrument;
-    ArrayList<RadioButton> radioButtons;
     Tuning currentTuning;
 
 
@@ -39,13 +39,13 @@ public class SelectTuningActivity extends AppCompatActivity {
             ab.setDisplayHomeAsUpEnabled(true);
         }
 
+        // get the spinner that will be used to select the desired instrument
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
-
         if (spinner != null) {
             final ArrayAdapter<Instrument> adapter = new ArrayAdapter<>(
                     this,
                     R.layout.support_simple_spinner_dropdown_item,
-                    Instrument.values()
+                    Instrument.values() // all of the possible choices for an instrument
             );
             spinner.setAdapter(adapter);
             spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
@@ -55,26 +55,30 @@ public class SelectTuningActivity extends AppCompatActivity {
                     if (i != null && !i.equals(currentInstrument)) {
                         currentInstrument = i;
                         currentTuning = null;
-                        updateRadioButtons();
+                        updateListView();
                     }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
+                    // we dont need to do anything on nothing selected
                 }
             });
+
+            // If the tuner activity has a selected tuning already,
+            // grab it and set it as the default
             Intent intent = getIntent();
             if (intent != null) {
                 int i = intent.getIntExtra(TunerActivity.INSTRUMENT, -1);
                 if (i != -1) {
+                    // I used the ordinals here because of the way inheritance works with enums
                     currentInstrument = Instrument.values()[i];
                     spinner.setSelection(adapter.getPosition(currentInstrument));
                     int t = intent.getIntExtra(TunerActivity.TUNING, -1);
                     if (t != -1) {
                         currentTuning = currentInstrument.getTunings()[t];
-                        updateRadioButtons();
+                        updateListView();
 
-                    } else if (radioButtons != null && radioButtons.size() > 0) {
                     }
                 }
             }
@@ -82,7 +86,10 @@ public class SelectTuningActivity extends AppCompatActivity {
 
     }
 
-    private void updateRadioButtons() {
+    /**
+     * updates the list view based off of the current instrument
+     */
+    private void updateListView() {
         if (currentInstrument != null) {
             ListView lv = (ListView) findViewById(R.id.tuning_list_view);
             if (lv != null) {
@@ -106,17 +113,18 @@ public class SelectTuningActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent i = new Intent(this, TunerActivity.class);
-        if (currentInstrument != null) {
+        if (currentInstrument != null && currentTuning != null) {
+            // used the ordinal because of inheritance with enums
             i.putExtra(INSTRUMENT, currentInstrument.ordinal());
-        }
-        if (currentTuning != null) {
             i.putExtra(TUNING, currentTuning.getOrdinal());
         }
         setResult(RESULT_OK, i);
-        System.out.println(i.getExtras().toString());
         finish();
     }
 
+    /**
+     * This is a special adapter made for displaying Tuning objects in a ListView
+     */
     private class TuningAdapter extends BaseAdapter {
 
         Tuning[] tunings;

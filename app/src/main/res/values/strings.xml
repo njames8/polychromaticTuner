@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Polychromatic Tuner</string>
-    <string name="title_activity_select_tuning">SelectTuningActivity</string>
+    <string name="title_activity_select_tuning">Select Tuning</string>
     <string name="select_tuning">Select Tuning</string>
     <string name="title_activity_main">MainActivity</string>
 </resources>
