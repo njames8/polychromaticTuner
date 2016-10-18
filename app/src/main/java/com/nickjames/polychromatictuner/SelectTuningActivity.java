@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -24,7 +25,6 @@ public class SelectTuningActivity extends AppCompatActivity {
 
     Spinner spinner;
     Instrument currentInstrument;
-    RadioGroup tuningGroup;
     ArrayList<RadioButton> radioButtons;
     Tuning currentTuning;
 
@@ -47,23 +47,6 @@ public class SelectTuningActivity extends AppCompatActivity {
         );
         spinner.setAdapter(adapter);
 
-        tuningGroup = (RadioGroup) findViewById(R.id.tuning_list);
-        if (tuningGroup != null) {
-            tuningGroup.setOrientation(RadioGroup.VERTICAL);
-            tuningGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
-                    boolean isChecked = checkedRadioButton.isChecked();
-                    if (isChecked) {
-                        currentTuning =
-                                currentInstrument.getTuningByDisplayName(
-                                        checkedRadioButton.getText().toString())
-                                ;
-                    }
-                }
-            });
-        }
 
 
         spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
@@ -78,8 +61,6 @@ public class SelectTuningActivity extends AppCompatActivity {
             }
         });
 
-        // we have to make the radiobuttons before setting the selected one
-
         Intent intent = getIntent();
         if (intent != null) {
             int i = intent.getIntExtra(TunerActivity.INSTRUMENT, -1);
@@ -89,23 +70,24 @@ public class SelectTuningActivity extends AppCompatActivity {
                 int t = intent.getIntExtra(TunerActivity.TUNING, -1);
                 if (t != -1) {
                     updateRadioButtons();
-                    setSelectedRadioButtonForTuning(currentInstrument.getTunings()[t]);
                 } else if (radioButtons != null && radioButtons.size() > 0) {
-                    setSelectedRadioButtonForTuning(currentInstrument.getTunings()[0]);
                 }
             }
         }
     }
 
     private void updateRadioButtons() {
-        Tuning [] tunings = currentInstrument.getTunings();
-        radioButtons = new ArrayList<>();
-        for (Tuning t : tunings) {
-            RadioButton rb = new RadioButton(this);
-            rb.setText(t.getDisplayName());
-            rb.setGravity(Gravity.CENTER_HORIZONTAL);
-            tuningGroup.addView(rb);
-            radioButtons.add(rb);
+        if (currentInstrument != null) {
+            ArrayAdapter<Tuning> tuningArrayAdapter = new ArrayAdapter<Tuning>(
+                    this,
+                    R.layout.list_item_tuning,
+                    R.id.list_item_radiobutton,
+                    currentInstrument.getTunings()
+            );
+            ListView lv = (ListView) findViewById(R.id.tuning_list_view);
+            if (lv != null) {
+                lv.setAdapter(tuningArrayAdapter);
+            }
         }
     }
 
@@ -123,13 +105,4 @@ public class SelectTuningActivity extends AppCompatActivity {
         finish();
     }
 
-    private void setSelectedRadioButtonForTuning(Tuning t) {
-        for (RadioButton rb : radioButtons) {
-            if (rb.getText().equals(t.getDisplayName())) {
-                rb.setSelected(true);
-            } else {
-                rb.setSelected(false);
-            }
-        }
-    }
 }
