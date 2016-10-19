@@ -14,4 +14,12 @@ public class Tuner {
     public Tuner(Note n) {
         this.note = n;
     }
+
+    public void start(){
+
+    }
+
+    public void stop() {
+
+    }
 }
