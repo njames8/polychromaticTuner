@@ -19,7 +19,11 @@
         <activity
             android:name=".SelectTuningActivity"
             android:label="@string/title_activity_select_tuning"
-            android:theme="@style/AppTheme.NoAppBar"/>
+            android:theme="@style/AppTheme.NoAppBar">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.nickjames.polychromatictuner.TunerActivity" />
+        </activity>
     </application>
 
 </manifest>

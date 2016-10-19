@@ -1,10 +1,10 @@
 package com.nickjames.polychromatictuner;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -34,10 +34,10 @@ public class SelectTuningActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_tuning);
 
-        ActionBar ab = getActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_select_tuning);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.title_activity_select_tuning);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // get the spinner that will be used to select the desired instrument
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
@@ -109,9 +109,7 @@ public class SelectTuningActivity extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    public void onBackPressed() {
+    private void createAndSetOKIntent() {
         Intent i = new Intent(this, TunerActivity.class);
         if (currentInstrument != null && currentTuning != null) {
             // used the ordinal because of inheritance with enums
@@ -119,7 +117,24 @@ public class SelectTuningActivity extends AppCompatActivity {
             i.putExtra(TUNING, currentTuning.getOrdinal());
         }
         setResult(RESULT_OK, i);
+    }
+
+    @Override
+    public void onBackPressed() {
+        createAndSetOKIntent();
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                createAndSetOKIntent();
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
