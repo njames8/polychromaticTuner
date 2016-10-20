@@ -21,7 +21,8 @@ public class TunerActivity extends AppCompatActivity {
     public static final String TUNING = "com.nickjames.polychromatictuner.TunerActivity.TUNING";
     public static final String INSTRUMENT = "com.nickjames.polychromatictuner.TunerActivity.INSTRUMENT";
     public static final int SELECT_TUNING_ACTIVITY = 1;
-    public static final int REQUEST_RECORD_AUDIO = 0;
+    private static final int REQUEST_RECORD_AUDIO = 0;
+    private static final int DEFAULT_RESPONSE = -1;
 
     Button tuningButton;
     Tuning currentTuning;
@@ -48,7 +49,7 @@ public class TunerActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view) {
-        stopTunerManager();
+        stopTunerManager(); // stop tuning when we switch activities
         Intent intent = new Intent(this, SelectTuningActivity.class);
         if (currentTuning != null) {
             intent.putExtra(TUNING, currentTuning.getOrdinal());
@@ -71,15 +72,19 @@ public class TunerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * processes the data in an intent for the chosen instrument and tuning
+     * @param data - intent containting the desired instrument and tuning
+     */
     private void processIntent(Intent data) {
         StringBuilder sb = new StringBuilder();
-        int ci = data.getIntExtra(SelectTuningActivity.INSTRUMENT, -1);
-        if (ci != -1) {
+        int ci = data.getIntExtra(SelectTuningActivity.INSTRUMENT, DEFAULT_RESPONSE);
+        if (ci != DEFAULT_RESPONSE) { // if result is default, then the extra is not present
             currentInstrument = Instrument.values()[ci];
             sb.append(currentInstrument.getDisplayName());
             sb.append(" - ");
-            int ct = data.getIntExtra(SelectTuningActivity.TUNING, -1);
-            if (ct != -1) {
+            int ct = data.getIntExtra(SelectTuningActivity.TUNING, DEFAULT_RESPONSE);
+            if (ct != DEFAULT_RESPONSE) { // if result is default, then the extra is not present
                 currentTuning = currentInstrument.getTunings()[ct];
                 getOrCreateTunerManager().setTuning(currentTuning);
                 sb.append(currentTuning.getDisplayName());
@@ -97,12 +102,14 @@ public class TunerActivity extends AppCompatActivity {
 
     private void startTunerManager() {
         if (currentTuning != null) {
+            //TODO: launch this process on a service
             tunerManager = new TunerManager(currentTuning);
             tunerManager.start();
         }
     }
 
     private void stopTunerManager() {
+        //TODO stop the service
         if (tunerManager != null) {
             tunerManager.stop();
         }
@@ -116,6 +123,7 @@ public class TunerActivity extends AppCompatActivity {
                     REQUEST_RECORD_AUDIO);
             return;
         } else {
+            // if the permission is already granted, just start the tuners
             startTunerManager();
         }
     }

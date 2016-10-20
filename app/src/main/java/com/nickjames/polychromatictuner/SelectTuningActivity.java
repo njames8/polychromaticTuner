@@ -109,6 +109,10 @@ public class SelectTuningActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Create the intent to pass back to the Tuner Activity and set it as the result for this
+     * activity
+     */
     private void createAndSetOKIntent() {
         Intent i = new Intent(this, TunerActivity.class);
         if (currentInstrument != null && currentTuning != null) {
@@ -131,7 +135,7 @@ public class SelectTuningActivity extends AppCompatActivity {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 createAndSetOKIntent();
-                finish();
+                finish(); // we need to finish to pass the intent back to the Tuner Activity
                 return true;
         }
         return super.onOptionsItemSelected(item);
